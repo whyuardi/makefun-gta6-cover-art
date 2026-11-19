@@ -3,82 +3,106 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice Cover Studio — GTA-style cover art maker</title>
+<title>Sunset Strip Cover Studio</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<main class="app">
-  <section class="controls" aria-label="Cover editor">
-    <h1>VICE COVER <span>STUDIO</span></h1>
-    <p class="tag">Your photo + a caption, turned into a multi-panel GTA-style poster cover. Everything runs offline, in your browser — photos never leave your machine.</p>
+<div class="shell">
+  <header class="topbar">
+    <div>
+      <h1>Sunset Strip Cover Studio</h1>
+      <p class="tagline">Your photo, your words — turned into a sun-soaked multi-panel poster. Everything stays on this machine.</p>
+    </div>
+    <div class="top-actions">
+      <button id="exportBtn" type="button" class="big-btn">Export PNG</button>
+    </div>
+  </header>
 
-    <section class="group">
-      <h2>1 · Photos</h2>
-      <label class="file">Add your photos
-        <input id="photo" type="file" accept="image/*" multiple>
-      </label>
-      <div class="row">
-        <button id="sample-boulevard" type="button">Sample: Boulevard</button>
-        <button id="sample-pier" type="button">Sample: Pier</button>
-        <button id="fillall" type="button">Fill all panels</button>
-      </div>
-      <div id="photostrip" class="strip" aria-label="Your photos — click one to put it in the selected panel"></div>
-      <p class="hint">Click a thumbnail to put that photo in the selected panel. Click a panel in the preview to select it.</p>
-    </section>
+  <div class="workspace">
+    <aside class="panel controls" aria-label="Cover controls">
+      <section>
+        <h2>1 · Photos</h2>
+        <label class="file-label">Add your photos
+          <input id="photoInput" type="file" accept="image/*" multiple>
+        </label>
+        <p class="hint">Photos never leave your computer. Click a thumbnail to put it in the selected panel.</p>
+        <div id="thumbStrip" class="thumbs"></div>
+        <div class="row">
+          <button id="fillAllBtn" type="button">Fill all panels</button>
+          <button id="artBtn" type="button">Drawn sunset art</button>
+        </div>
+      </section>
 
-    <section class="group">
-      <h2>2 · Layout</h2>
-      <div id="layouts" class="row" role="group" aria-label="Panel layout"></div>
-    </section>
+      <section>
+        <h2>2 · Layout &amp; grade</h2>
+        <div class="seg" id="layoutSeg" role="group" aria-label="Layout">
+          <button type="button" data-layout="hero2" class="on">Hero + 2</button>
+          <button type="button" data-layout="grid">2 × 2 grid</button>
+          <button type="button" data-layout="cols3">3 columns</button>
+        </div>
+        <div class="seg" id="gradeSeg" role="group" aria-label="Colour grade">
+          <button type="button" data-grade="sunset" class="on">Sunset</button>
+          <button type="button" data-grade="neon">Neon night</button>
+          <button type="button" data-grade="pastel">Pastel</button>
+        </div>
+        <div class="seg" id="sizeSeg" role="group" aria-label="Export size">
+          <button type="button" data-size="square" class="on">1080 × 1080</button>
+          <button type="button" data-size="tall">1080 × 1350</button>
+          <button type="button" data-size="wide">1920 × 1080</button>
+        </div>
+      </section>
 
-    <section class="group">
-      <h2>3 · Colour grade</h2>
-      <div id="grades" class="row" role="group" aria-label="Colour grade"></div>
-    </section>
+      <section>
+        <h2>3 · Words</h2>
+        <label>Caption
+          <input id="captionInput" type="text" maxlength="42" value="Sunset Heist">
+        </label>
+        <label>Sub-caption
+          <input id="subInput" type="text" maxlength="64" value="One last job before the sun goes down">
+        </label>
+        <label>Caption size <span id="capSizeVal">100%</span>
+          <input id="capSize" type="range" min="60" max="150" value="100">
+        </label>
+        <div class="row">
+          <label class="check"><input id="bandTop" type="checkbox"> Band on top</label>
+          <label class="check"><input id="neonToggle" type="checkbox" checked> Neon outline</label>
+          <label class="check"><input id="slantToggle" type="checkbox" checked> Slanted type</label>
+        </div>
+      </section>
 
-    <section class="group">
-      <h2>4 · Caption</h2>
-      <label>Caption <input id="caption" type="text" maxlength="40" value="Vice Heist"></label>
-      <label>Sub-caption <input id="sub" type="text" maxlength="40" value="Sunset Strip"></label>
-      <label>Caption size <span class="val" id="captionsizeval">100%</span>
-        <input id="captionsize" type="range" min="0.6" max="1.4" step="0.05" value="1">
-      </label>
-      <label>Caption position
-        <select id="captionpos">
-          <option value="bottom">Bottom band</option>
-          <option value="top">Top band</option>
-        </select>
-      </label>
-      <div class="row checks">
-        <label><input id="outline" type="checkbox" checked> Neon outline</label>
-        <label><input id="italic" type="checkbox" checked> Slanted type</label>
-      </div>
-    </section>
+      <section>
+        <h2>4 · Selected panel</h2>
+        <p class="hint" id="panelLabel">Panel 1 of 3 — click a panel in the preview to pick it.</p>
+        <label>Photo in this panel
+          <select id="panelPhoto"></select>
+        </label>
+        <label>Zoom <span id="zoomVal">100%</span>
+          <input id="zoom" type="range" min="100" max="260" value="100">
+        </label>
+        <label>Pan left–right
+          <input id="panX" type="range" min="-50" max="50" value="0">
+        </label>
+        <label>Pan up–down
+          <input id="panY" type="range" min="-50" max="50" value="0">
+        </label>
+      </section>
 
-    <section class="group">
-      <h2>5 · Selected panel</h2>
-      <p class="panelname" id="panelname">Panel 1 of 3</p>
-      <label>Photo in this panel <select id="panelphoto"></select></label>
-      <label>Zoom <span class="val" id="zoomval">1.00×</span>
-        <input id="zoom" type="range" min="1" max="2.5" step="0.05" value="1">
-      </label>
-      <label>Move left / right <input id="panx" type="range" min="-0.5" max="0.5" step="0.01" value="0"></label>
-      <label>Move up / down <input id="pany" type="range" min="-0.5" max="0.5" step="0.01" value="0"></label>
-    </section>
-
-    <section class="group export">
-      <h2>6 · Export</h2>
-      <label>Size <select id="size"></select></label>
-      <button id="export" type="button">Export PNG</button>
       <p id="status" role="status"></p>
-    </section>
-  </section>
+    </aside>
 
-  <section class="preview" aria-label="Live preview">
-    <canvas id="cover" width="860" height="860" aria-label="The cover preview — click a panel to edit it"></canvas>
-    <p class="hint">Live preview — click a panel to crop and position it.</p>
-  </section>
-</main>
+    <main class="panel preview-wrap" aria-label="Cover preview">
+      <div class="preview-head">
+        <span>Live preview — click a panel to select it</span>
+        <span id="sizeNote">1080 × 1080</span>
+      </div>
+      <canvas id="preview" width="1080" height="1080" aria-label="Cover preview"></canvas>
+    </main>
+  </div>
+
+  <footer class="foot">
+    <span>Original art drawn in code — no game logos, artwork or fonts. Free to use with your own photos.</span>
+  </footer>
+</div>
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>
