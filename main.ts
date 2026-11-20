@@ -15,9 +15,28 @@ import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-app.ts';
+import { readdirSync, statSync } from 'node:fs';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+
+// Pre-flight: fail fast here if the screenshots would break the scorer's caps,
+// instead of copying them and dying later inside the dossier build.
+const shotsDir = join(here, 'screenshots');
+let shotCount = 0;
+if (existsSync(shotsDir)) {
+  const shots = readdirSync(shotsDir).filter((f) => statSync(join(shotsDir, f)).isFile());
+  shotCount = shots.length;
+  if (shots.length > 4) {
+    throw new Error(`Pre-flight: ${shots.length} screenshots in screenshots/, the cap is 4`);
+  }
+  for (const shot of shots) {
+    const size = statSync(join(shotsDir, shot)).size;
+    if (size > 262144) {
+      throw new Error(`Pre-flight: ${shot} is ${size} bytes, over the 256 KiB screenshot limit`);
+    }
+  }
+}
 
 mkdirSync(out, { recursive: true });
 cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
@@ -38,3 +57,5 @@ writeFileSync(
     app_path_max_bytes: 1000,
   }),
 );
+
+console.log(`Wrote dossier.json with ${shotCount} screenshot(s) copied.`);

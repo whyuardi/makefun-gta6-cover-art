@@ -1,2 +1,12 @@
+# Local build output, regenerated on every run
 out/
+# Second local output folder, same idea as out/
 out2/
+# Installed packages, fetched again with npm install
+node_modules/
+# Local secrets, never share these
+.env
+# Logs from local test runs
+*.log
+# macOS Finder metadata files
+.DS_Store
